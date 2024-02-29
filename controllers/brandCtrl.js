@@ -2,8 +2,8 @@ const Brand = require("../models/brandModel");
 const validateMongodbId = require("../utils/validateMongodbId");
 
 const createBrand = async (req, res) => {
-  const brand = await Brand.create(req.body);
-  res.json(brand);
+  const newbrand = await Brand.create(req.body);
+  res.json(newbrand);
 };
 const updateBrand = async (req, res) => {
   const { id } = req.params;

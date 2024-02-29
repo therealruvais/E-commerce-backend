@@ -1,6 +1,6 @@
-const mongoose = require("mongoose"); // Erase if already required
+const mongoose = require("mongoose"); 
 
-// Declare the Schema of the Mongo model
+
 var productSchema = new mongoose.Schema(
   {
     title: {
@@ -41,10 +41,8 @@ var productSchema = new mongoose.Schema(
     images: {
       type: Array,
     },
-    color: {
-      type: String,
-      required: true,
-    },
+    color: [],
+    tags:[],
     ratings: [
       {
         star: Number,

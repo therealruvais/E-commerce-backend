@@ -14,6 +14,8 @@ const pCategoryRoute = require('./routes/pCategoryRoute')
 const blogCategoryRoute = require('./routes/blogCatRoute')
 const brandRouter = require('./routes/brandRoute')
 const couponRoute = require('./routes/couponRoute')
+const colorRoute = require('./routes/colorRoute')
+const enquiryRoute = require('./routes/enqRoute')
 
 const express = require("express");
 const app = express();
@@ -29,6 +31,8 @@ app.use("/api/pcategory", pCategoryRoute);
 app.use("/api/blogcategory", blogCategoryRoute);
 app.use("/api/brand", brandRouter);
 app.use("/api/coupon", couponRoute);
+app.use("/api/color", colorRoute);
+app.use("/api/enquiry", enquiryRoute);
 
 app.use(notFound);
 app.use(errorHandler);

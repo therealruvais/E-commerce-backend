@@ -2,9 +2,11 @@ const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const slugify = require("slugify");
 const validateMongodbId = require("../utils/validateMongodbId");
-const cloudinaryUploadImg = require('../utils/cloudinary')
-const fs = require('fs')
-
+const {
+  cloudinaryUploadImg,
+  cloudinaryDeleteImg,
+} = require("../utils/cloudinary");
+const fs = require("fs");
 
 const createProduct = async (req, res) => {
   try {
@@ -20,7 +22,7 @@ const createProduct = async (req, res) => {
 
 const updateaProduct = async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id)
+  validateMongodbId(id);
   try {
     if (req.body.title) {
       req.body.slug = slugify(req.body.title);
@@ -39,7 +41,7 @@ const updateaProduct = async (req, res) => {
 };
 const deleteaProduct = async (req, res) => {
   const { id } = req.params;
-  validateMongodbId(id)
+  validateMongodbId(id);
   try {
     const deleteProduct = await Product.findOneAndDelete(id);
     res.json(deleteProduct);
@@ -51,7 +53,7 @@ const deleteaProduct = async (req, res) => {
 const getaProduct = async (req, res) => {
   try {
     const { id } = req.params;
-      validateMongodbId(id);
+    validateMongodbId(id);
 
     const findaProduct = await Product.findById(id);
     res.json({ findaProduct });
@@ -131,7 +133,7 @@ const addToWhishlist = async (req, res) => {
 
 const rating = async (req, res) => {
   const { _id } = req.user;
-  const { star,comment, prodId } = req.body;
+  const { star, comment, prodId } = req.body;
   const product = await Product.findById(prodId);
   let alreadyRated = product.ratings.find(
     (userId) => userId.postedby.toString() === _id.toString()
@@ -153,7 +155,7 @@ const rating = async (req, res) => {
         $push: {
           ratings: {
             star: star,
-            comment:comment,
+            comment: comment,
             postedby: _id,
           },
         },
@@ -161,40 +163,44 @@ const rating = async (req, res) => {
       { new: true }
     );
   }
-   const getallratings = await Product.findById(prodId);
-   let totalRating = getallratings.ratings.length;
-   let ratingsum = getallratings.ratings
-     .map((item) => item.star)
-     .reduce((prev, curr) => prev + curr, 0);
-   let actualRating = Math.round(ratingsum / totalRating);
-   let finalproduct = await Product.findByIdAndUpdate(
-     prodId,
-     {
-       totalrating: actualRating,
-     },
-     { new: true }
-   );
-   res.json(finalproduct);
+  const getallratings = await Product.findById(prodId);
+  let totalRating = getallratings.ratings.length;
+  let ratingsum = getallratings.ratings
+    .map((item) => item.star)
+    .reduce((prev, curr) => prev + curr, 0);
+  let actualRating = Math.round(ratingsum / totalRating);
+  let finalproduct = await Product.findByIdAndUpdate(
+    prodId,
+    {
+      totalrating: actualRating,
+    },
+    { new: true }
+  );
+  res.json(finalproduct);
 };
 
 const uploadImages = async (req, res) => {
-  const { id } = req.params;
-  validateMongodbId(id);
   const uploader = (path) => cloudinaryUploadImg(path, "images");
   const urls = [];
   const files = req.files;
 
   for (const file of files) {
     const { path } = file;
-    const newPath = await uploader(path)
-    urls.push(newPath)
-    fs.unlinkSync(path)
+    const newPath = await uploader(path);
+    urls.push(newPath);
+    fs.unlinkSync(path);
   }
-  const findProduct = await Product.findByIdAndUpdate(id, { images: urls.map((file) => { return file }) }, { new: true })
-  res.json(findProduct)
-}
+  const images = urls.map((file) => {
+    return file;
+  });
+  res.json(images);
+};
 
-
+const deleteImage = async (req, res) => {
+  const { id } = req.params;
+  const deleted =  cloudinaryDeleteImg(id, "images");
+  res.json({ msg: "deleted" });
+};
 
 module.exports = {
   createProduct,
@@ -205,4 +211,5 @@ module.exports = {
   addToWhishlist,
   rating,
   uploadImages,
+  deleteImage,
 };
